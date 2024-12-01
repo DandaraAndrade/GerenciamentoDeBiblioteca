@@ -1,53 +1,50 @@
 package br.edu.unisep.biblioteca.view.telas;
 
-import javax.swing.*;
-
 import br.edu.unisep.biblioteca.model.Livro;
-import br.edu.unisep.biblioteca.model.LivroDigital;
 import br.edu.unisep.biblioteca.model.LivroFisico;
+import br.edu.unisep.biblioteca.model.LivroDigital;
 import br.edu.unisep.biblioteca.util.Funcoes;
 
-public class TelaDevolver extends JFrame {
-    private Funcoes controle = new Funcoes();
+import javax.swing.*;
+import java.awt.*;
 
-    public TelaDevolver() {
-        setTitle("Devolver Livro");
-        setSize(400, 300);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLayout(null);
+public class TelaDevolver extends JPanel {
+    public TelaDevolver(Funcoes controle) {
+        setLayout(new BorderLayout());
 
-        JLabel lblTitulo = new JLabel("Título do Livro:");
-        lblTitulo.setBounds(50, 50, 100, 30);
-        add(lblTitulo);
+        JLabel lblTitulo = new JLabel("Devolução de Livros", JLabel.CENTER);
+        lblTitulo.setFont(new Font("Arial", Font.BOLD, 16));
+        add(lblTitulo, BorderLayout.NORTH);
 
-        JTextField txtTitulo = new JTextField();
-        txtTitulo.setBounds(150, 50, 200, 30);
-        add(txtTitulo);
+        JPanel painelCentral = new JPanel(new GridLayout(0, 1));
+        JButton btnLivro1 = new JButton("Devolver: 1984");
+        JButton btnLivro2 = new JButton("Devolver: O Pequeno Príncipe");
 
-        JButton btnDevolver = new JButton("Devolver");
-        btnDevolver.setBounds(150, 100, 100, 30);
-        add(btnDevolver);
+        painelCentral.add(btnLivro1);
+        painelCentral.add(btnLivro2);
 
-        JLabel lblMensagem = new JLabel("");
-        lblMensagem.setBounds(50, 150, 300, 30);
-        add(lblMensagem);
+        add(painelCentral, BorderLayout.CENTER);
 
-        btnDevolver.addActionListener(e -> {
-            String titulo = txtTitulo.getText();
-            Livro livro = buscarLivro(titulo); // Simula a busca por um livro (implemente este método)
-            if (livro != null && controle.devolverLivro(livro)) {
-                lblMensagem.setText("Livro devolvido com sucesso!");
+        JLabel lblStatus = new JLabel(" ", JLabel.CENTER);
+        lblStatus.setForeground(Color.BLUE);
+        add(lblStatus, BorderLayout.SOUTH);
+
+        btnLivro1.addActionListener(e -> {
+            Livro livro = new LivroFisico("1984", "George Orwell", "Ficção", "Estante A1");
+            if (controle.devolverLivro(livro)) {
+                lblStatus.setText("Livro '1984' devolvido com sucesso!");
             } else {
-                lblMensagem.setText("Erro ao devolver o livro!");
+                lblStatus.setText("O livro '1984' não está emprestado.");
             }
         });
-    }
-    private Livro buscarLivro(String titulo) {
-        if ("1984".equalsIgnoreCase(titulo)) {
-            return new LivroFisico("1984", "George Orwell", "Ficção", "Estante A1");
-        } else if ("O Pequeno Príncipe".equalsIgnoreCase(titulo)) {
-            return new LivroDigital("O Pequeno Príncipe", "Antoine de Saint-Exupéry", "Infantil", "www.download.com/principe");
-        }
-        return null;
+
+        btnLivro2.addActionListener(e -> {
+            Livro livro = new LivroDigital("O Pequeno Príncipe", "Antoine de Saint-Exupéry", "Infantil", "www.download.com/principe");
+            if (controle.devolverLivro(livro)) {
+                lblStatus.setText("Livro 'O Pequeno Príncipe' devolvido com sucesso!");
+            } else {
+                lblStatus.setText("O livro 'O Pequeno Príncipe' não está emprestado.");
+            }
+        });
     }
 }

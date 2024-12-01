@@ -47,4 +47,3 @@ public abstract class Livro {
 
     public abstract void exibirDetalhes();
 }
-

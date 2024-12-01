@@ -1,55 +1,68 @@
 package br.edu.unisep.biblioteca.view.telas;
 
-import javax.swing.*;
-
 import br.edu.unisep.biblioteca.model.Livro;
-import br.edu.unisep.biblioteca.model.LivroDigital;
 import br.edu.unisep.biblioteca.model.LivroFisico;
+import br.edu.unisep.biblioteca.model.LivroDigital;
+import br.edu.unisep.biblioteca.model.Usuario;
 import br.edu.unisep.biblioteca.util.Funcoes;
 
-public class TelaEmprestar extends JFrame {
-    private Funcoes controle = new Funcoes();
+import javax.swing.*;
+import java.awt.*;
+import java.util.List;
 
-    public TelaEmprestar() {
-        setTitle("Emprestar Livro");
-        setSize(400, 300);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLayout(null);
+public class TelaEmprestar extends JPanel {
+    public TelaEmprestar(Funcoes controle) {
+        setLayout(new BorderLayout());
 
-        JLabel lblTitulo = new JLabel("Título do Livro:");
-        lblTitulo.setBounds(50, 50, 100, 30);
-        add(lblTitulo);
+        JLabel lblTitulo = new JLabel("Empréstimo de Livros", JLabel.CENTER);
+        lblTitulo.setFont(new Font("Arial", Font.BOLD, 16));
+        add(lblTitulo, BorderLayout.NORTH);
 
-        JTextField txtTitulo = new JTextField();
-        txtTitulo.setBounds(150, 50, 200, 30);
-        add(txtTitulo);
+        JPanel painelCentral = new JPanel(new GridLayout(0, 1));
+        JButton btnLivro1 = new JButton("Emprestar: 1984");
+        JButton btnLivro2 = new JButton("Emprestar: O Pequeno Príncipe");
+        painelCentral.add(btnLivro1);
+        painelCentral.add(btnLivro2);
+        add(painelCentral, BorderLayout.CENTER);
 
-        JButton btnEmprestar = new JButton("Emprestar");
-        btnEmprestar.setBounds(150, 100, 100, 30);
-        add(btnEmprestar);
+        JLabel lblStatus = new JLabel(" ", JLabel.CENTER);
+        lblStatus.setForeground(Color.BLUE);
+        add(lblStatus, BorderLayout.SOUTH);
 
-        JLabel lblMensagem = new JLabel("");
-        lblMensagem.setBounds(50, 150, 300, 30);
-        add(lblMensagem);
-
-        btnEmprestar.addActionListener(e -> {
-            String titulo = txtTitulo.getText();
-            Livro livro = buscarLivro(titulo); // Simula a busca por um livro (implemente este método)
-            if (livro != null && controle.emprestarLivro(livro)) {
-                lblMensagem.setText("Livro emprestado com sucesso!");
-            } else {
-                lblMensagem.setText("Erro ao emprestar o livro!");
-            }
-        });
+        btnLivro1.addActionListener(e -> realizarEmprestimo(controle, new LivroFisico("1984", "George Orwell", "Ficção", "Estante A1"), lblStatus));
+        btnLivro2.addActionListener(e -> realizarEmprestimo(controle, new LivroDigital("O Pequeno Príncipe", "Antoine de Saint-Exupéry", "Infantil", "www.download.com/principe"), lblStatus));
     }
 
-    private Livro buscarLivro(String titulo) {
-        if ("1984".equalsIgnoreCase(titulo)) {
-            return new LivroFisico("1984", "George Orwell", "Ficção", "Estante A1");
-        } else if ("O Pequeno Príncipe".equalsIgnoreCase(titulo)) {
-            return new LivroDigital("O Pequeno Príncipe", "Antoine de Saint-Exupéry", "Infantil", "www.download.com/principe");
+    private void realizarEmprestimo(Funcoes controle, Livro livro, JLabel lblStatus) {
+        Usuario usuario = selecionarUsuario(controle);
+        if (usuario != null) {
+            if (controle.emprestarLivro(livro, usuario)) {
+                lblStatus.setText("Livro emprestado para: " + usuario.getNome());
+            } else {
+                lblStatus.setText("Livro já está emprestado.");
+            }
+        } else {
+            lblStatus.setText("Operação cancelada.");
+        }
+    }
+
+    private Usuario selecionarUsuario(Funcoes controle) {
+        List<Usuario> usuarios = controle.listarUsuarios();
+        if (usuarios.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Nenhum usuário cadastrado.", "Erro", JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
+
+        String[] opcoes = usuarios.stream().map(Usuario::toString).toArray(String[]::new);
+        String selecionado = (String) JOptionPane.showInputDialog(this, "Selecione um usuário:", "Usuários", JOptionPane.QUESTION_MESSAGE, null, opcoes, opcoes[0]);
+
+        if (selecionado != null) {
+            for (Usuario usuario : usuarios) {
+                if (usuario.toString().equals(selecionado)) {
+                    return usuario;
+                }
+            }
         }
         return null;
     }
 }
-
