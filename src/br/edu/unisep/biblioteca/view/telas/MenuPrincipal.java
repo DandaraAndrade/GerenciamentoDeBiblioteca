@@ -1,4 +1,4 @@
-package br.edu.unisep.biblioteca.view;
+package br.edu.unisep.biblioteca.view.telas;
 
 import br.edu.unisep.biblioteca.model.*;
 import br.edu.unisep.biblioteca.util.Funcoes;
